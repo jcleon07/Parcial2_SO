@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 
     char *collector_ip = argv[1];
     int collector_port = atoi(argv[2]);
-    char *ip_logica = argv[3];
+    char *ip_logica_agente = argv[3];
 
     int sock = connect_to_collector(collector_ip, collector_port);
     if (sock < 0) {
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
         char line[256];
         sprintf(line,
             "MEM;%s;%.2f;%.2f;%.2f;%.2f\n",
-            ip_logica, mem_used_mb, mem_free_mb, swap_total_mb, swap_free_mb
+            ip_logica_agente, mem_used_mb, mem_free_mb, swap_total_mb, swap_free_mb
         );
 
         send(sock, line, strlen(line), 0);
