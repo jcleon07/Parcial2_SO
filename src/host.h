@@ -11,6 +11,7 @@ struct HostInfo {
     float mem_free_mb;
     float swap_total_mb;
     float swap_free_mb;
+    time_t last_update;
 };
 
 #endif
