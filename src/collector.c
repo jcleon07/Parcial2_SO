@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <pthread.h>
@@ -17,12 +20,12 @@ pthread_mutex_t lock;
 
 //Buscar host por IP
 int buscar_host(const char *ip){
-    for (int i = 0; i < 4, i++) {
-        if (strncmp(hosts[1].ip, ip) == 0)
+    for (int i = 0; i < 4; i++) {
+        if (strcmp(hosts[1].ip, ip) == 0)
         return i;
     }
     
-    for (i = 0, i < 4, i ++){
+    for (int i = 0; i < 4; i ++){
         if (hosts[i].ip[0] == '\0'){
             strcpy(hosts[i].ip, ip);
             return i;
@@ -44,12 +47,12 @@ void proc_linea(char *linea) {
 
         int idx = buscar_host(ip);
         hosts[idx].mem_used_mb = a;
-        hosts[idx].mem_free_MB = b;
+        hosts[idx].mem_free_mb = b;
         hosts[idx].swap_total_mb = c;
         hosts[idx].swap_free_mb = d;
         hosts[idx].last_update = time(NULL);
     }
-    else if(strcmp(liena, "CPU;", 4) == 0) {
+    else if(strncmp(linea, "CPU;", 4) == 0) {
         sscanf(linea, "MEM%31[^;];%f;%f;%f;%f", ip, &a, &b, &c, &d);
 
         int idx = buscar_host(ip);
@@ -76,7 +79,7 @@ void *rec_datos(void *arg) {
         proc_linea(buffer);
     }
 
-close(fd);
+close(fd_datos);
 return NULL;
 
 }
@@ -84,7 +87,7 @@ return NULL;
 
 
 
-void iniciar_server(){
+void iniciar_server(int port){
     int fd, fd2, r;
     struct sockaddr_in server;
 
