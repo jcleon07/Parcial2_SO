@@ -52,7 +52,7 @@ int buscar_host(const char *ip){
             return i;
         }
     }
-    return 0;
+    return -1;
 }
 
 /*
@@ -190,7 +190,7 @@ void *hilo_viewer(void *arg){
 
         for (int i = 0; i < 4; i++){
             if (hosts[i].ip[0] != '\0'){
-                printf("%-15s %5.1f %5.1f %5.1f %5.1f   %8.1f %8.1f\n",
+                printf("%-15s   %5.1f   %5.1f   %5.1f   %5.1f   %8.1f %8.1f\n",
                 hosts[i].ip,
                 hosts[i].cpu_usage,
                 hosts[i].cpu_user,
