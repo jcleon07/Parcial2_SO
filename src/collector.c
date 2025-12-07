@@ -37,7 +37,7 @@ int buscar_host(const char *ip){
 
 //Hilo que procesa linea enviada por un agente
 void proc_linea(char *linea) {
-    char tipo[8], ip[32];
+    char ip[32];
     float a, b, c, d;
 
     pthread_mutex_lock(&lock);
@@ -88,7 +88,8 @@ return NULL;
 
 
 void iniciar_server(int port){
-    int fd, fd2, r;
+    int fd, r;
+    int *fd2;
     struct sockaddr_in server;
 
     fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -110,6 +111,7 @@ void iniciar_server(int port){
             exit(-1);
         }
 
+    //Poner socket en modo escucha
     r = listen(fd, 4);
         if (r < 0) {
             perror("Error en el listen");
@@ -122,15 +124,16 @@ void iniciar_server(int port){
     pthread_mutex_init(&lock, NULL);
 
     while (1) {
-        fd2 = accept(fd, NULL, NULL);
+        fd2 = malloc(sizeof(int));
+        *fd2 = accept(fd, NULL, NULL);
             if (fd2 < 0) {
             perror("Error en el accept");
             close(fd);
-            close(fd2);
+            close(*fd2);
             exit(-1);
     }
         pthread_t t;
-        pthread_create(&t, NULL, rec_datos, &fd2);
+        pthread_create(&t, NULL, rec_datos, fd2);
         pthread_detach(t);
     }
 }
@@ -140,7 +143,7 @@ void *hilo_viewer(void *arg){
     while(1) {
         pthread_mutex_lock(&lock);
 
-        printf("\033[2J\033[H");
+        system("clear");
         printf("IP              CPU%%  usr  sys  idle   MemUsed  MemFree\n");
 
         for (int i = 0; i < 4; i++){
