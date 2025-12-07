@@ -186,7 +186,7 @@ void *hilo_viewer(void *arg){
         pthread_mutex_lock(&lock);
 
         system("clear");
-        printf("IP              CPU%%  usr  sys  idle   MemUsed  MemFree\n");
+        printf("IP              CPU%%  CPU_usr%%  CPU_sys%%  CPU_idle%%   MemUsed  MemFree  \n");
 
         for (int i = 0; i < 4; i++){
             if (hosts[i].ip[0] != '\0'){
@@ -198,6 +198,7 @@ void *hilo_viewer(void *arg){
                 hosts[i].cpu_idle,
                 hosts[i].mem_used_mb,
                 hosts[i].mem_free_mb);
+                
             }
         }
 
