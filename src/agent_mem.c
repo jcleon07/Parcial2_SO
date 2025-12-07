@@ -5,7 +5,7 @@
 #include <arpa/inet.h>
 
 
-typedef struct {
+typedef struct  {
     long mem_total_kb;
     long mem_available_kb;
     long mem_free_kb;
@@ -65,22 +65,22 @@ int main(int argc, char *argv[]) {
 
     int sock = connect_to_collector(collector_ip, collector_port);
     if (sock < 0) {
-        printf("No se pudo conectar al colector\n");
+        printf("El agente de memoria no se pudo conectar al colector\n");
         return 1;
     }
 
-    AgentMem m;
+    AgentMem agente;
 
     while (1) {
-        if (read_meminfo(&m) != 0) {
+        if (read_meminfo(&agente) != 0) {
             printf("Error leyendo /proc/meminfo\n");
             break;
         }
 
-        float mem_used_mb = (m.mem_total_kb - m.mem_available_kb) / 1024.0;
-        float mem_free_mb = m.mem_free_kb / 1024.0;
-        float swap_total_mb = m.swap_total_kb / 1024.0;
-        float swap_free_mb = m.swap_free_kb / 1024.0;
+        float mem_used_mb = (agente.mem_total_kb - agente.mem_available_kb) / 1024.0;
+        float mem_free_mb = agente.mem_free_kb / 1024.0;
+        float swap_total_mb = agente.swap_total_kb / 1024.0;
+        float swap_free_mb = agente.swap_free_kb / 1024.0;
 
         char line[256];
         sprintf(line,
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
 
         send(sock, line, strlen(line), 0);
 
-        sleep(1); // espera un segundo
+        sleep(1); // espera un segundo para la siguiente lectura
     }
 
     close(sock);
