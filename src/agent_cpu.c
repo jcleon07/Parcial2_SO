@@ -101,7 +101,7 @@ int main(int argc, char *argv[]){
                                  + delta_iowait + delta_irq + delta_softirq + delta_steal;
         
         // Calcular CPU_idle
-        unsigned long cpu_idle = delta_idle;
+        unsigned long cpu_idle = 100.0 * delta_idle / cpu_total;
         
         // Evitar división por cero
         if (cpu_total == 0) {
@@ -109,11 +109,15 @@ int main(int argc, char *argv[]){
         }
         
         // Calcular porcentaje de uso
-        float cpu_usage = 100.0 * (cpu_total - cpu_idle) / cpu_total;
+        unsigned long cpu_usage = 100.0 * (cpu_total - delta_idle) / cpu_total;
+
+        unsigned long cpu_user = 100.0 * delta_user / cpu_total;
+        unsigned long cpu_system = 100.0 * delta_system / cpu_total;
         
-        // Enviar datos al colector en formato: CPU;ip;porcentaje
+        
+        //CPU;<ip_logica_agente>;<CPU_usage>;<user_pct>;<system_pct>;<idle_pct>\n
         char line[256];
-        sprintf(line, "CPU;%s;%.2f\n", ip_logica_agente, cpu_usage);
+        sprintf(line, "CPU;%s;%.2f;%.2f;%.2f;%.2f\n", ip_logica_agente, cpu_usage, cpu_user, cpu_system, cpu_idle);
         send(sock, line, strlen(line), 0);
         
         // Sleep antes de siguiente iteración
