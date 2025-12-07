@@ -70,7 +70,7 @@ void proc_linea(char *linea) {
         hosts[idx].last_update = time(NULL);
     }
     else if(strncmp(linea, "CPU;", 4) == 0) {
-        sscanf(linea, "MEM%31[^;];%f;%f;%f;%f", ip, &a, &b, &c, &d);
+        sscanf(linea, "CPU;%31[^;];%f;%f;%f;%f", ip, &a, &b, &c, &d);
 
         int idx = buscar_host(ip);
         hosts[idx].cpu_usage = a;
