@@ -17,6 +17,11 @@ pthread_t threads[MAX_CLIENTS];
 struct HostInfo hosts[4];
 pthread_mutex_t lock;
 
+/*
+
+   FUNCIONES   
+
+*/
 
 //Funcion para encontrar espacio libre para el descriptor
 int encontrar_espacio(){
@@ -50,6 +55,11 @@ int buscar_host(const char *ip){
     return 0;
 }
 
+/*
+
+   HILOS
+
+*/
 
 //Hilo que procesa linea enviada por un agente
 void proc_linea(char *linea) {
@@ -105,8 +115,7 @@ void *rec_datos(void *arg) {
 }
 
 
-
-
+//Inicializacion del servidor
 void iniciar_server(int port){
     int fd, r;
     int fd2;
@@ -164,7 +173,14 @@ void iniciar_server(int port){
     }
 }
 
-//viewer
+
+
+/*
+
+    VIEWER
+
+*/
+
 void *hilo_viewer(void *arg){
     while(1) {
         pthread_mutex_lock(&lock);
@@ -191,7 +207,11 @@ void *hilo_viewer(void *arg){
 }
 
 
+/*
 
+    MAIN
+
+*/
 
 int main(int argc, char *argv[]){
     if (argc < 2) {
