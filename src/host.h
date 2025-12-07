@@ -1,6 +1,8 @@
 #ifndef HOST_H
 #define HOST_H
 
+#include <time.h>
+
 struct HostInfo {
     char ip[32];
     float cpu_usage;

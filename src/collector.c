@@ -8,9 +8,25 @@
 #include <pthread.h>
 #include "host.h"
 
+#define MAX_CLIENTS 16
 
+int client_fds[MAX_CLIENTS];
+pthread_t threads[MAX_CLIENTS];
+
+//Estructura para almacenar el uso de memoria y CPU
 struct HostInfo hosts[4];
 pthread_mutex_t lock;
+
+
+//Funcion para encontrar espacio libre para el descriptor
+int encontrar_espacio(){
+    for (int i = 0; i < MAX_CLIENTS; i++){
+        if (client_fds[i] == 0)
+            return i;
+    }
+    return -1;
+}
+
 
 //Inicializacion del arreglo de hosts
  void init_hosts(){
@@ -21,7 +37,7 @@ pthread_mutex_t lock;
 //Buscar host por IP
 int buscar_host(const char *ip){
     for (int i = 0; i < 4; i++) {
-        if (strcmp(hosts[1].ip, ip) == 0)
+        if (strcmp(hosts[i].ip, ip) == 0)
         return i;
     }
     
@@ -40,6 +56,7 @@ void proc_linea(char *linea) {
     char ip[32];
     float a, b, c, d;
 
+    //Proteccion para evitar condicion de carrera
     pthread_mutex_lock(&lock);
 
     if(strncmp(linea, "MEM;", 4) == 0) {
@@ -66,21 +83,24 @@ void proc_linea(char *linea) {
     pthread_mutex_unlock(&lock);
 }
 
+
 //Para manejar un cliente
 void *rec_datos(void *arg) {
-    int fd_datos = *(int*)arg;
+    int *fd_datos = (int*)arg;
     char buffer[256];
 
     while (1) {
-        int n = recv (fd_datos, buffer, sizeof(buffer)-1, 0);
+        int n = recv (*fd_datos, buffer, sizeof(buffer)-1, 0);
         if (n <= 0) break;
 
         buffer[n] = '\0';
         proc_linea(buffer);
     }
 
-close(fd_datos);
-return NULL;
+    close(*fd_datos);
+
+    *fd_datos = 0;
+    return NULL;
 
 }
 
@@ -89,7 +109,7 @@ return NULL;
 
 void iniciar_server(int port){
     int fd, r;
-    int *fd2;
+    int fd2;
     struct sockaddr_in server;
 
     fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -124,17 +144,23 @@ void iniciar_server(int port){
     pthread_mutex_init(&lock, NULL);
 
     while (1) {
-        fd2 = malloc(sizeof(int));
-        *fd2 = accept(fd, NULL, NULL);
+        int espacio = encontrar_espacio();
+            if (espacio < 0){
+                int tmp = accept(fd, NULL, NULL);
+                close(tmp);
+                continue;
+            }
+
+        fd2 = accept(fd, NULL, NULL);
             if (fd2 < 0) {
             perror("Error en el accept");
             close(fd);
-            close(*fd2);
+            close(fd2);
             exit(-1);
-    }
-        pthread_t t;
-        pthread_create(&t, NULL, rec_datos, fd2);
-        pthread_detach(t);
+        }
+
+        client_fds[espacio] = fd2;
+        pthread_create(&threads[espacio], NULL, rec_datos, &client_fds[espacio]);
     }
 }
 
