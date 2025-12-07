@@ -24,13 +24,6 @@ while (fgets(line, sizeof(line), f)) {
         break;
     }
 }
-// Código anterios para probar la lectura en la función main
-// printf("Label: %s\n", cpu_label);
-// printf("user: %lu nice: %lu system: %lu idle:%lu\n",m->user, m->nice, m->system, m->idle);
-// } else {
-// fprintf(stderr, "No se pudo leer la línea de cpu\n");
-// }
-
 
 fclose(f);
 return 0;
