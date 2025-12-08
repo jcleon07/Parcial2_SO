@@ -14,7 +14,7 @@ int client_fds[MAX_CLIENTS];
 pthread_t threads[MAX_CLIENTS];
 
 //Estructura para almacenar el uso de memoria y CPU
-struct HostInfo hosts[4];
+struct HostInfo hosts[MAX_CLIENTS];
 pthread_mutex_t lock;
 
 /*
@@ -35,18 +35,18 @@ int encontrar_espacio(){
 
 //Inicializacion del arreglo de hosts
  void init_hosts(){
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < MAX_CLIENTS; i++)
         memset(&hosts[i], 0, sizeof(struct HostInfo));
  }
 
 //Buscar host por IP
 int buscar_host(const char *ip){
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < MAX_CLIENTS; i++) {
         if (strcmp(hosts[i].ip, ip) == 0)
         return i;
     }
     
-    for (int i = 0; i < 4; i ++){
+    for (int i = 0; i < MAX_CLIENTS; i ++){
         if (hosts[i].ip[0] == '\0'){
             strcpy(hosts[i].ip, ip);
             return i;
@@ -69,7 +69,7 @@ void proc_linea(char *linea) {
     //Proteccion para evitar condicion de carrera
     pthread_mutex_lock(&lock);
 
-    if(strncmp(linea, "MEM;", 4) == 0) {
+    if(strncmp(linea, "MEM;", MAX_CLIENTS) == 0) {
         sscanf(linea, "MEM;%31[^;];%f;%f;%f;%f", ip, &a, &b, &c, &d);
 
         int idx = buscar_host(ip);
@@ -79,7 +79,7 @@ void proc_linea(char *linea) {
         hosts[idx].swap_free_mb = d;
         hosts[idx].last_update = time(NULL);
     }
-    else if(strncmp(linea, "CPU;", 4) == 0) {
+    else if(strncmp(linea, "CPU;", MAX_CLIENTS) == 0) {
         sscanf(linea, "CPU;%31[^;];%f;%f;%f;%f", ip, &a, &b, &c, &d);
 
         int idx = buscar_host(ip);
@@ -141,7 +141,7 @@ void iniciar_server(int port){
         }
 
     //Poner socket en modo escucha
-    r = listen(fd, 4);
+    r = listen(fd, MAX_CLIENTS);
         if (r < 0) {
             perror("Error en el listen");
             close(fd);
@@ -188,7 +188,7 @@ void *hilo_viewer(void *arg){
         system("clear");
         printf("IP              CPU%%  CPU_usr%%  CPU_sys%%  CPU_idle%%   MemUsed  MemFree  \n");
 
-        for (int i = 0; i < 4; i++){
+        for (int i = 0; i < MAX_CLIENTS; i++){
             if (hosts[i].ip[0] != '\0'){
                 if (hosts[i].last_update < time(NULL)-2) {
                     // No hay datos todavía
