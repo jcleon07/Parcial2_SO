@@ -100,19 +100,16 @@ int main(int argc, char *argv[]){
         unsigned long cpu_total = delta_user + delta_nice + delta_system + delta_idle 
                                  + delta_iowait + delta_irq + delta_softirq + delta_steal;
         
-        // Calcular CPU_idle
-        unsigned long cpu_idle = 100.0 * delta_idle / cpu_total;
-        
         // Evitar división por cero
         if (cpu_total == 0) {
             cpu_total = 1;
         }
         
-        // Calcular porcentaje de uso
-        unsigned long cpu_usage = 100.0 * (cpu_total - delta_idle) / cpu_total;
-
-        unsigned long cpu_user = 100.0 * delta_user / cpu_total;
-        unsigned long cpu_system = 100.0 * delta_system / cpu_total;
+        // Calcular porcentajes como floats
+        float cpu_idle = 100.0 * delta_idle / cpu_total;
+        float cpu_usage = 100.0 * (cpu_total - delta_idle) / cpu_total;
+        float cpu_user = 100.0 * delta_user / cpu_total;
+        float cpu_system = 100.0 * delta_system / cpu_total;
         
         
         //CPU;<ip_logica_agente>;<CPU_usage>;<user_pct>;<system_pct>;<idle_pct>\n
