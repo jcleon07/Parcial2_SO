@@ -190,14 +190,22 @@ void *hilo_viewer(void *arg){
 
         for (int i = 0; i < 4; i++){
             if (hosts[i].ip[0] != '\0'){
-                printf("%-15s   %5.1f   %5.1f   %5.1f   %5.1f   %8.1f %8.1f\n",
-                hosts[i].ip,
-                hosts[i].cpu_usage,
-                hosts[i].cpu_user,
-                hosts[i].cpu_system,
-                hosts[i].cpu_idle,
-                hosts[i].mem_used_mb,
-                hosts[i].mem_free_mb);
+                if (hosts[i].last_update < time(NULL)-2) {
+                    // No hay datos todavía
+                    printf("%-15s   %5s   %5s   %5s   %5s   %8s %8s\n",
+                        hosts[i].ip, "--", "--", "--", "--", "--", "--");
+                } else {
+                    // Datos disponibles
+                    printf("%-15s   %5.1f   %5.1f   %5.1f   %5.1f   %8.1f %8.1f\n",
+                        hosts[i].ip,
+                        hosts[i].cpu_usage,
+                        hosts[i].cpu_user,
+                        hosts[i].cpu_system,
+                        hosts[i].cpu_idle,
+                        hosts[i].mem_used_mb,
+                        hosts[i].mem_free_mb);
+                }
+
                 
             }
         }
