@@ -69,7 +69,7 @@ void proc_linea(char *linea) {
     //Proteccion para evitar condicion de carrera
     pthread_mutex_lock(&lock);
 
-    if(strncmp(linea, "MEM;", MAX_CLIENTS) == 0) {
+    if(strncmp(linea, "MEM;", 4) == 0) {
         sscanf(linea, "MEM;%31[^;];%f;%f;%f;%f", ip, &a, &b, &c, &d);
 
         int idx = buscar_host(ip);
@@ -79,7 +79,7 @@ void proc_linea(char *linea) {
         hosts[idx].swap_free_mb = d;
         hosts[idx].last_update = time(NULL);
     }
-    else if(strncmp(linea, "CPU;", MAX_CLIENTS) == 0) {
+    else if(strncmp(linea, "CPU;", 4) == 0) {
         sscanf(linea, "CPU;%31[^;];%f;%f;%f;%f", ip, &a, &b, &c, &d);
 
         int idx = buscar_host(ip);
