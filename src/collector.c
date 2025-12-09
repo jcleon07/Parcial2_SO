@@ -10,6 +10,7 @@
 
 #define MAX_CLIENTS 16
 
+//Arreglos para almacenar los clientes y los hilos
 int client_fds[MAX_CLIENTS];
 pthread_t threads[MAX_CLIENTS];
 
@@ -17,11 +18,11 @@ pthread_t threads[MAX_CLIENTS];
 struct HostInfo hosts[MAX_CLIENTS];
 pthread_mutex_t lock;
 
-/*
+/*------------------------------------------------------------------------
 
-   FUNCIONES   
+                                FUNCIONES   
 
-*/
+------------------------------------------------------------------------*/
 
 //Funcion para encontrar espacio libre para el descriptor
 int encontrar_espacio(){
@@ -49,17 +50,17 @@ int buscar_host(const char *ip){
     for (int i = 0; i < MAX_CLIENTS; i ++){
         if (hosts[i].ip[0] == '\0'){
             strcpy(hosts[i].ip, ip);
-            return i;
+            return i;   
         }
     }
     return -1;
 }
 
-/*
+/*------------------------------------------------------------------------
 
-   HILOS
+                                    HILOS   
 
-*/
+------------------------------------------------------------------------*/
 
 //Hilo que procesa linea enviada por un agente
 void proc_linea(char *linea) {
@@ -175,11 +176,11 @@ void iniciar_server(int port){
 
 
 
-/*
+/*------------------------------------------------------------------------
 
-    VIEWER
+                                    VIEWER   
 
-*/
+------------------------------------------------------------------------*/
 
 void *hilo_viewer(void *arg){
     while(1) {
@@ -216,11 +217,11 @@ void *hilo_viewer(void *arg){
 }
 
 
-/*
+/*------------------------------------------------------------------------
 
-    MAIN
+                                    MAIN   
 
-*/
+------------------------------------------------------------------------*/
 
 int main(int argc, char *argv[]){
     if (argc < 2) {
